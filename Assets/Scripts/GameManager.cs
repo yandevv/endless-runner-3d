@@ -1,10 +1,11 @@
-// GameManager.cs
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public bool IsPlaying { get; private set; }
+    public float gameOverDelay = 1.5f;
 
     void Awake()
     {
@@ -18,6 +19,8 @@ public class GameManager : MonoBehaviour
         IsPlaying = false;
         ScoreManager.SaveHighScore();
         Debug.Log("Game Over — high score saved");
-        // Scene transition gets added in step 4
+        Invoke(nameof(LoadGameOver), gameOverDelay);
     }
+
+    void LoadGameOver() => SceneManager.LoadScene("GameOver");
 }
