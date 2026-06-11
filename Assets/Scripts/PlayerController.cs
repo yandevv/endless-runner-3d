@@ -2,26 +2,35 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float jumpForce = 8f;
-    public float laneSpeed = 8f;   // left/right dodge speed
-    public float laneLimit = 3f;   // how far sideways you can go
+    public float laneSpeed = 8f;
+    public float laneLimit = 3f;
 
     [Header("Slide")]
     public float slideDuration = 0.8f;
 
+    [Header("Animation")]
+    public Animator animator;
+
     private Rigidbody rb;
+    private CapsuleCollider capsule;
     private bool isGrounded = true;
     private bool isSliding = false;
     private float slideTimer;
-    private Vector3 normalScale;
+
+    private float normalHeight;
+    private Vector3 normalCenter;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        normalScale = transform.localScale;
+        capsule = GetComponent<CapsuleCollider>();
+        normalHeight = capsule.height;
+        normalCenter = capsule.center;
     }
 
     void Update()
@@ -35,6 +44,7 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
+            if (animator != null) animator.SetTrigger("Jump");
         }
 
         if (keyboard.leftCtrlKey.wasPressedThisFrame && isGrounded && !isSliding)
@@ -84,13 +94,21 @@ public class PlayerController : MonoBehaviour
     {
         isSliding = true;
         slideTimer = slideDuration;
-        transform.localScale = new Vector3(normalScale.x, normalScale.y * 0.5f, normalScale.z);
+        // shrink only the collider so we pass under SlideBars; the model is untouched
+        capsule.height = normalHeight * 0.5f;
+        capsule.center = new Vector3(
+            normalCenter.x,
+            normalCenter.y - normalHeight * 0.25f,
+            normalCenter.z);
+        if (animator != null) animator.SetBool("IsSliding", true);
     }
 
     void EndSlide()
     {
         isSliding = false;
-        transform.localScale = normalScale;
+        capsule.height = normalHeight;
+        capsule.center = normalCenter;
+        if (animator != null) animator.SetBool("IsSliding", false);
     }
 
     void OnCollisionEnter(Collision collision)
