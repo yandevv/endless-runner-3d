@@ -349,14 +349,6 @@ Use the Play button in the Unity Editor to start the game from the menu.
 
 ---
 
-## License
-
-This repository currently does not include a dedicated license file. If you intend to reuse, distribute, or publish this project outside the academic context, add a license that matches your intended usage.
-
-Third-party assets keep their original licenses. The Kenney Platformer Kit assets are CC0.
-
----
-
 ## What I Learned
 
 This project helped me practice the full workflow of building a small 3D game in Unity, from scene organization to player movement and game state management.
